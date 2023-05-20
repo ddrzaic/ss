@@ -8,59 +8,11 @@ import {
 } from "@/components/StoryCard/StoryCard";
 import { filterStoryCards } from "@/helpers/common";
 
-const allStoryCards: StoryCardProps[] = [
-  {
-    title: "Story 1Story 1Story 1Story 1",
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    category: "Action",
-    author: "Author 1",
-    date: "2021-10-10",
-    isFavorite: false,
-  },
-  {
-    title: "Story 2",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    category: "Category 2",
-    author: "Author 2",
-    date: "2021-10-10",
-    isFavorite: true,
-  },
-  {
-    title: "Story 1",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    category: "Category 1",
-    author: "Author 1",
-    date: "2021-10-10",
-    isFavorite: false,
-  },
-  {
-    title: "Story 2",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    category: "Category 2",
-    author: "Author 2",
-    date: "2021-10-10",
-    isFavorite: true,
-  },
-  {
-    title: "Story 1",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    category: "Category 1",
-    author: "Author 1",
-    date: "2021-10-10",
-    isFavorite: false,
-  },
-  {
-    title: "Story 2",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    category: "Category 2",
-    author: "Author 2",
-    date: "2021-10-10",
-    isFavorite: true,
-  },
-];
+type HomePageProps = {
+  storyCards: StoryCardProps[];
+};
 
-export const HomePage = () => {
+export const HomePage = ({ storyCards: allStoryCards }: HomePageProps) => {
   const [filters, setFilters] = React.useState<Filters>({} as Filters);
   const [storyCards, setStoryCards] =
     React.useState<StoryCardProps[]>(allStoryCards);

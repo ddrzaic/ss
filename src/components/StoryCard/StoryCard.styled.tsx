@@ -12,6 +12,8 @@ export const StoryCardContainer = styled.div(
     transition: all 0.2s ease-in-out;
     overflow: hidden;
     background-color: ${theme.palette?.primary.white};
+    cursor: pointer;
+
     &:hover {
       transform: scale(1.03);
     }

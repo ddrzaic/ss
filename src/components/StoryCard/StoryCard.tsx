@@ -1,9 +1,11 @@
 import React from "react";
 import * as S from "./StoryCard.styled";
-import { IconButton } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useRouter } from "next/router";
 
 export type StoryCardProps = {
+  id: number;
   title: string;
   content: string;
   category: string;
@@ -14,6 +16,7 @@ export type StoryCardProps = {
 };
 
 export const StoryCard: React.FC<StoryCardProps> = ({
+  id,
   title,
   content,
   category,
@@ -22,9 +25,19 @@ export const StoryCard: React.FC<StoryCardProps> = ({
   isFavorite,
   testId,
 }) => {
+  const { push } = useRouter();
+
+  const onClickHandler = () => {
+    push(`/story/${id}`);
+  };
+
+  const handleFavoriteClick = (id: number) => {};
+
   return (
-    <S.StoryCardContainer data-testid={testId}>
-      <S.StoryCardTitle>{title}</S.StoryCardTitle>
+    <S.StoryCardContainer data-testid={testId} onClick={onClickHandler}>
+      <Tooltip title={title} placement="top">
+        <S.StoryCardTitle>{title}</S.StoryCardTitle>
+      </Tooltip>
       <S.StoryCardContent>{content}</S.StoryCardContent>
       <S.StoryCardMeta>
         <S.StoryCardMetaItem>{category}</S.StoryCardMetaItem>
@@ -32,9 +45,21 @@ export const StoryCard: React.FC<StoryCardProps> = ({
         <S.StoryCardMetaItem>{date}</S.StoryCardMetaItem>
       </S.StoryCardMeta>
       <S.StoryCardActions>
-        <IconButton aria-label="add to favorites" disableRipple>
-          <FavoriteIcon color={isFavorite ? "secondary" : "primary"} />
-        </IconButton>
+        <Tooltip
+          title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          placement="top"
+        >
+          <IconButton
+            aria-label="add to favorites"
+            disableRipple
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFavoriteClick(id);
+            }}
+          >
+            <FavoriteIcon color={isFavorite ? "secondary" : "primary"} />
+          </IconButton>
+        </Tooltip>
       </S.StoryCardActions>
     </S.StoryCardContainer>
   );
@@ -57,6 +82,7 @@ export const StoryCardsWrapper = ({ storyCards }: StoryCardsWrapperProps) => {
         author={storyCard.author}
         date={storyCard.date}
         isFavorite={storyCard.isFavorite}
+        id={storyCard.id}
       />
     );
   });
