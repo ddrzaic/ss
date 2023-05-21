@@ -3,11 +3,18 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { FiltersBar } from "./FiltersBar";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
+import { Filters } from "@/types/common";
 
 jest.mock("axios");
 
 const props = {
-  filters: {},
+  filters: {
+    name: "",
+    category: {
+      id: 1,
+      label: "test",
+    },
+  } as Filters,
   setFilters: jest.fn(),
   testId: "filters-bar",
 };
