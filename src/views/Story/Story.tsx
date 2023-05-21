@@ -2,7 +2,7 @@ import { CommentSection } from "@/components/CommentSection/CommentSection";
 import { Header } from "@/components/Header/Header";
 import { StoryDetails } from "@/components/StoryDetails/StoryDetails";
 import { Story } from "@/types/common";
-import React from "react";
+import React, { useCallback } from "react";
 
 type StoryProps = {
   story: Story;
@@ -24,7 +24,7 @@ export const StoryPage = ({ story }: StoryProps) => {
   const [isCommentSectionLoading, setIsCommentSectionLoading] =
     React.useState(false);
 
-  const handleCommentSectionUpdate = () => {
+  const handleCommentSectionUpdate = useCallback(() => {
     // fetch comments
     const asyncFetchComments = async () => {
       setIsCommentSectionLoading(true);
@@ -39,7 +39,7 @@ export const StoryPage = ({ story }: StoryProps) => {
       setIsCommentSectionLoading(false);
     };
     asyncFetchComments();
-  };
+  }, [id]);
 
   return (
     <>

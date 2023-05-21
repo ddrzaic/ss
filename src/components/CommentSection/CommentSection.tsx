@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import * as S from "./CommentSection.styled";
 import {
   Avatar,
@@ -37,6 +37,9 @@ export const CommentSection = ({
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isLoadingState, setIsLoadingState] = React.useState(isLoading);
   const [isCommentInvalid, setIsCommentInvalid] = React.useState(false);
+  const [commentToDelete, setCommentToDelete] = React.useState<number | null>(
+    null
+  );
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const content = event.target.value;
@@ -76,44 +79,51 @@ export const CommentSection = ({
     setIsModalOpen(true);
   };
 
-  const handleDeleteComment = async (id: number) => {
-    try {
-      setIsLoadingState(true);
-      const response = await axios.delete(`/api/comment`, {
-        params: { id: id, jwt: user?.jwt, userId: user?.id },
-      });
+  const handleDeleteComment = useCallback(
+    async (id: number) => {
+      try {
+        setIsLoadingState(true);
+        const response = await axios.delete(`/api/comment`, {
+          params: { id: id, jwt: user?.jwt, userId: user?.id },
+        });
 
-      if (response.status === 200 && notify) {
-        notify();
+        if (response.status === 200 && notify) {
+          notify();
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
-    }
 
-    setIsModalOpen(false);
-    setIsLoadingState(false);
-  };
+      setIsModalOpen(false);
+      setIsLoadingState(false);
+    },
+    [user, notify]
+  );
 
-  const handleEditComment = (id: number) => {
-    setIsCommentInvalid(false);
-    setEditingCommentId(id);
-    setComment("");
-    const commentToEdit = comments.find((comment) => comment.id === id);
-    if (commentToEdit) {
-      setCommentEdit(commentToEdit?.content || "");
-    }
-  };
+  const handleEditComment = useCallback(
+    (id: number) => {
+      setIsCommentInvalid(false);
+      setEditingCommentId(id);
+      setComment("");
+      const commentToEdit = comments.find((comment) => comment.id === id);
+      if (commentToEdit) {
+        setCommentEdit(commentToEdit?.content || "");
+      }
+    },
+    [comments]
+  );
 
-  const handleEditCommentContent = (
-    event: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    const content = event.target.value;
-    const isContentValid = validateComment(content);
-    setIsCommentInvalid(!isContentValid);
-    setCommentEdit(content);
-  };
+  const handleEditCommentContent = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const content = event.target.value;
+      const isContentValid = validateComment(content);
+      setIsCommentInvalid(!isContentValid);
+      setCommentEdit(content);
+    },
+    []
+  );
 
-  const handleSaveComment = async () => {
+  const handleSaveComment = useCallback(async () => {
     if (!user || isCommentInvalid) {
       return;
     }
@@ -137,92 +147,86 @@ export const CommentSection = ({
     setEditingCommentId(null);
     setCommentEdit("");
     setIsLoadingState(false);
-  };
+  }, [editingCommentId, commentEdit, user, notify, isCommentInvalid]);
 
-  const commentCards = comments.map((comment) => (
-    <S.Paper key={comment.id}>
-      <Grid container wrap="nowrap" spacing={2}>
-        <Grid item>
-          <Avatar alt="user" />
-          {user?.id === comment.userId && (
-            <S.CommentActions>
-              <S.ActionButton title="Edit" placement="top">
-                <EditIcon onClick={() => handleEditComment(comment.id)} />
-              </S.ActionButton>
-              <S.ActionButton title="Delete" placement="top">
-                <DeleteIcon onClick={openConfirmationModal} />
-              </S.ActionButton>
-            </S.CommentActions>
-          )}
-        </Grid>
-        <Grid justifyContent="left" item xs zeroMinWidth>
-          <S.CommentAuthor style={{ margin: 0, textAlign: "left" }}>
-            {comment.user}
-          </S.CommentAuthor>
-          {editingCommentId === comment.id ? (
-            <S.CommentEditingWrapper>
-              <S.CommentInput
-                onChange={handleEditCommentContent}
-                value={commentEdit}
-                minRows={2}
-                isInvalid={isCommentInvalid}
-              />
+  const commentCards = React.useMemo(() => {
+    return comments.map((comment) => (
+      <S.Paper key={comment.id}>
+        <Grid container wrap="nowrap" spacing={2}>
+          <Grid item>
+            <Avatar alt="user" />
+            {user?.id === comment.userId && (
               <S.CommentActions>
-                <S.Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSaveComment}
-                  disabled={!user || isCommentInvalid}
-                >
-                  Save
-                </S.Button>
-
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => {
-                    setEditingCommentId(null);
-                    setIsCommentInvalid(false);
-                  }}
-                >
-                  Cancel
-                </Button>
+                <S.ActionButton title="Edit" placement="top">
+                  <EditIcon onClick={() => handleEditComment(comment.id)} />
+                </S.ActionButton>
+                <S.ActionButton title="Delete" placement="top">
+                  <DeleteIcon
+                    onClick={() => {
+                      openConfirmationModal();
+                      setCommentToDelete(comment.id);
+                    }}
+                  />
+                </S.ActionButton>
               </S.CommentActions>
-            </S.CommentEditingWrapper>
-          ) : (
-            <p>{comment.content}</p>
-          )}
-          <S.CommentTimestamp>
-            {formatDateTime(comment.timestamp).date}
-            {" at "}
-            {formatDateTime(comment.timestamp).time}
-          </S.CommentTimestamp>
+            )}
+          </Grid>
+          <Grid justifyContent="left" item xs zeroMinWidth>
+            <S.CommentAuthor style={{ margin: 0, textAlign: "left" }}>
+              {comment.user}
+            </S.CommentAuthor>
+            {editingCommentId === comment.id ? (
+              <S.CommentEditingWrapper>
+                <S.CommentInput
+                  onChange={handleEditCommentContent}
+                  value={commentEdit}
+                  minRows={2}
+                  isInvalid={isCommentInvalid}
+                />
+                <S.CommentActions>
+                  <S.Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSaveComment}
+                    disabled={!user || isCommentInvalid}
+                  >
+                    Save
+                  </S.Button>
+
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => {
+                      setEditingCommentId(null);
+                      setIsCommentInvalid(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </S.CommentActions>
+              </S.CommentEditingWrapper>
+            ) : (
+              <p>{comment.content}</p>
+            )}
+            <S.CommentTimestamp>
+              {formatDateTime(comment.timestamp).date}
+              {" at "}
+              {formatDateTime(comment.timestamp).time}
+            </S.CommentTimestamp>
+          </Grid>
         </Grid>
-      </Grid>
-      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <S.ModalContainer>
-          <h2>Are you sure you want to delete this comment?</h2>
-          <S.CommentActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => handleDeleteComment(comment.id)}
-              data-testid="delete-comment-button"
-            >
-              Yes
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => setIsModalOpen(false)}
-            >
-              No
-            </Button>
-          </S.CommentActions>
-        </S.ModalContainer>
-      </Modal>
-    </S.Paper>
-  ));
+      </S.Paper>
+    ));
+  }, [
+    comments,
+    user,
+    editingCommentId,
+    commentEdit,
+    isCommentInvalid,
+    handleEditComment,
+    handleEditCommentContent,
+    handleSaveComment,
+  ]);
 
   return (
     <S.CommentSectionWrapper data-testid="comment-section">
@@ -255,6 +259,39 @@ export const CommentSection = ({
           </S.Button>
         </>
       )}
+      <Modal
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setCommentToDelete(null);
+        }}
+      >
+        <S.ModalContainer>
+          <h2>Are you sure you want to delete this comment?</h2>
+          <S.CommentActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() =>
+                commentToDelete && handleDeleteComment(commentToDelete)
+              }
+              data-testid="delete-comment-button"
+            >
+              Yes
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                setIsModalOpen(false);
+                setCommentToDelete(null);
+              }}
+            >
+              No
+            </Button>
+          </S.CommentActions>
+        </S.ModalContainer>
+      </Modal>
     </S.CommentSectionWrapper>
   );
 };
