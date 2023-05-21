@@ -26,7 +26,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 yarn test
 ```
 
-## Upute za pokretanje integracijskih testova:
+## Upute za pokretanje e2e testova:
 
 ```bash
 yarn cypress
