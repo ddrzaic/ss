@@ -9,11 +9,13 @@ import { validateName } from "@/helpers/common";
 type FiltersBarProps = {
   filters: Filters;
   setFilters: (filters: Filters) => void;
+  testId?: string;
 };
 
 export const FiltersBar: React.FC<FiltersBarProps> = ({
   filters,
   setFilters,
+  testId,
 }) => {
   const [categories, setCategories] = React.useState<Category[]>([]);
   const [category, setCategory] = React.useState<Category>(
@@ -64,7 +66,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
   }, []);
 
   return (
-    <S.FiltersBarWrapper>
+    <S.FiltersBarWrapper data-testid={testId}>
       <Autocomplete
         disablePortal
         id="category-select"
@@ -84,6 +86,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
           onChange={handleNameChange}
           value={name}
           error={isNameInvalid}
+          data-testid="filters-name-input"
         />
       </S.TextFieldWrapper>
     </S.FiltersBarWrapper>

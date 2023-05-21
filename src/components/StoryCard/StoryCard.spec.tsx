@@ -25,6 +25,7 @@ describe("StoryCard", () => {
   it("renders correctly", () => {
     render(<StoryCard testId="story-card" {...mockStory} />);
     expect(screen.getByTestId("story-card")).toBeInTheDocument();
+    expect(screen.getByTestId("story-card")).toMatchSnapshot();
     const favoriteButton = screen.getByTestId("favorite-button");
     expect(favoriteButton).toBeInTheDocument();
     favoriteButton.click();

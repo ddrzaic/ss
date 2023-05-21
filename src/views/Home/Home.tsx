@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Header } from "@/components/Header/Header";
 import { FiltersBar } from "@/components/FiltersBar/FiltersBar";
 import { Filters } from "@/types/common";
@@ -21,24 +21,29 @@ export const HomePage = ({ storyCards: allStoryCards }: HomePageProps) => {
 
   const filtersChangeHandler = async (newFilters: Filters) => {
     setIsLoading(true);
-    const response = await axios.get("/api/stories", {
-      params: {
-        name: newFilters.name,
-        category: newFilters.category?.id,
-      },
-    });
+    try {
+      const response = await axios.get("/api/stories", {
+        params: {
+          name: newFilters.name,
+          category: newFilters.category?.id,
+        },
+      });
 
-    const stories = response.data.stories;
+      const stories = response.data.stories;
 
-    let storyCards: StoryCardProps[] = [];
+      let storyCards: StoryCardProps[] = [];
 
-    stories.forEach((story: any) => {
-      storyCards.push(mapStoryToStoryCard(story));
-    });
+      stories.forEach((story: any) => {
+        storyCards.push(mapStoryToStoryCard(story));
+      });
 
-    setStoryCards(storyCards);
+      setStoryCards(storyCards);
+      setFilters(newFilters);
+    } catch (error) {
+      console.log(error);
+    }
+
     setIsLoading(false);
-    setFilters(newFilters);
   };
 
   return (
