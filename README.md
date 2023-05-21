@@ -31,3 +31,5 @@ yarn test
 ```bash
 yarn cypress
 ```
+
+## SQL skripta za kreiranje i punjenje baze nalazi se u korijenskom direktoriju repozitorija (DB_INIT.SQL)
