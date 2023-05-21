@@ -2,6 +2,15 @@ DZ3 INFSUS
 
 ## Upute za instalaciju i pokretanje:
 
+Potrebno kreirati .env.local datoteku u korijenskom direktoriju repozitorija (ispod naveden primjer):
+
+```bash
+DB_USER=admin
+DB_PASSWORD=password
+DB_HOST=dpg-chkdk13hp8uej77s49ag-a.frankfurt-postgres.render.com
+DB_NAME=sharestory
+```
+
 ```bash
 yarn install
 yarn dev
