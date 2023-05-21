@@ -19,32 +19,25 @@ export const HomePage = ({ storyCards: allStoryCards }: HomePageProps) => {
     React.useState<StoryCardProps[]>(allStoryCards);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchFilteredStories = async () => {
-      setIsLoading(true);
-      const response = await axios.get("/api/stories", {
-        params: {
-          name: filters.name,
-          category: filters.category?.id,
-        },
-      });
+  const filtersChangeHandler = async (newFilters: Filters) => {
+    setIsLoading(true);
+    const response = await axios.get("/api/stories", {
+      params: {
+        name: newFilters.name,
+        category: newFilters.category?.id,
+      },
+    });
 
-      const stories = response.data.stories;
+    const stories = response.data.stories;
 
-      let storyCards: StoryCardProps[] = [];
+    let storyCards: StoryCardProps[] = [];
 
-      stories.forEach((story: any) => {
-        storyCards.push(mapStoryToStoryCard(story));
-      });
+    stories.forEach((story: any) => {
+      storyCards.push(mapStoryToStoryCard(story));
+    });
 
-      setStoryCards(storyCards);
-      setIsLoading(false);
-    };
-
-    fetchFilteredStories();
-  }, [filters.category?.id, filters.name]);
-
-  const filtersChangeHandler = (newFilters: Filters) => {
+    setStoryCards(storyCards);
+    setIsLoading(false);
     setFilters(newFilters);
   };
 

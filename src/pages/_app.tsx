@@ -27,7 +27,7 @@ const theme = createTheme({
 } as ThemeOptions);
 
 const mockUser: User = {
-  id: 2,
+  id: 1,
   name: "John Doe",
   email: "user@gmail.com",
   jwt: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIn0.uUhtmccmDIK8fG3vmsNfqQ0N5i556nAzJyLyOsxQ4no",

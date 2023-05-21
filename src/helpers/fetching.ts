@@ -1,5 +1,6 @@
 import { Category, Comment, Filters, Story } from "@/types/common";
 import { conn } from "./db";
+import { validateComment } from "./common";
 
 export const fetchStories = async (filters: Filters): Promise<Story[]> => {
   let WHERE = "WHERE stories.id IS NOT NULL";
@@ -119,6 +120,7 @@ export const fetchComments = async (storyId: number) => {
     FROM comments
     LEFT JOIN users ON comments.userid = users.id
     WHERE comments.storyId = $1
+    ORDER BY comments.published ASC
   `;
   const response = await conn.query(commentsQuery, [storyId]);
 
@@ -200,7 +202,11 @@ export const addComment = async (
   content: string
 ) => {
   const timestamp = new Date().toISOString();
-  console.log("timestamp", timestamp);
+  const isCommentValid = validateComment(content);
+
+  if (!isCommentValid) {
+    throw new Error("Comment is not valid");
+  }
 
   const addCommentQuery = `
     INSERT INTO comments (userId, storyId, content, published) VALUES ($1, $2, $3, $4)
@@ -219,6 +225,11 @@ export const deleteComment = async (commentId: number) => {
 
 export const editComment = async (commentId: number, content: string) => {
   const timestamp = new Date().toISOString();
+  const isCommentValid = validateComment(content);
+
+  if (!isCommentValid) {
+    throw new Error("Comment is not valid");
+  }
 
   const editCommentQuery = `
     UPDATE comments SET content = $1, published = $2 WHERE id = $3

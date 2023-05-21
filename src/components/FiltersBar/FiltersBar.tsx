@@ -4,6 +4,7 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { Category, Filters } from "@/types/common";
 import axios from "axios";
+import { validateName } from "@/helpers/common";
 
 type FiltersBarProps = {
   filters: Filters;
@@ -19,6 +20,8 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
     filters.category as Category
   );
   const [name, setName] = React.useState(filters.name);
+  const [isNameInvalid, setIsNameInvalid] = React.useState<boolean>(false);
+
   const timeoutRef = React.useRef<NodeJS.Timeout>();
 
   const handleCategoryChange = (
@@ -32,7 +35,14 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
   const handleNameChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    setName(event.target.value);
+    setIsNameInvalid(false);
+    const name = event.target.value;
+    const isNameValid = validateName(name);
+    setName(name);
+    if (!isNameValid) {
+      setIsNameInvalid(true);
+      return;
+    }
 
     // set filters after 350ms
     if (timeoutRef.current) {
@@ -60,9 +70,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
         id="category-select"
         options={categories}
         sx={{ width: 300 }}
-        renderInput={(params) => (
-          <TextField {...params} label="Category" onChange={handleNameChange} />
-        )}
+        renderInput={(params) => <TextField {...params} label="Category" />}
         onChange={handleCategoryChange}
         value={category}
       />
@@ -75,6 +83,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
           fullWidth
           onChange={handleNameChange}
           value={name}
+          error={isNameInvalid}
         />
       </S.TextFieldWrapper>
     </S.FiltersBarWrapper>

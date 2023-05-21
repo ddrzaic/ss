@@ -30,14 +30,16 @@ export const CommentTimestamp = styled.p(
   `
 );
 
-export const CommentInput = styled(TextareaAutosize)(
-  ({ theme }) => css`
+export const CommentInput = styled(TextareaAutosize)<{ isInvalid?: boolean }>(
+  ({ theme, isInvalid }) => css`
     margin: 10px 0;
     resize: none;
     padding: 10px;
-    border: 1px solid ${theme.palette.primary.main};
+    border: 1px solid
+      ${isInvalid ? theme.palette.error.main : theme.palette.primary.main};
     border-radius: 5px;
     font-size: 16px;
+
     &:focus {
       outline: none;
     }

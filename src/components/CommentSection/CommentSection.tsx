@@ -13,7 +13,7 @@ import { useUser } from "../UserProvider/UserProvider";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-import { formatDateTime } from "@/helpers/common";
+import { formatDateTime, validateComment } from "@/helpers/common";
 
 type CommentSectionProps = {
   comments: Comment[];
@@ -35,13 +35,23 @@ export const CommentSection = ({
   );
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isLoadingState, setIsLoadingState] = React.useState(isLoading);
+  const [isCommentInvalid, setIsCommentInvalid] = React.useState(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(event.target.value);
+    const content = event.target.value;
+    const isContentValid = validateComment(content);
+    setIsCommentInvalid(!isContentValid);
+    setComment(content);
   };
 
   const handlePostComment = async () => {
+    if (!user || isCommentInvalid) {
+      return;
+    }
+
     try {
+      setIsLoadingState(true);
       const response = await axios.post(`/api/comment`, {
         content: comment,
         userId: user?.id,
@@ -59,6 +69,7 @@ export const CommentSection = ({
     } catch (error) {
       console.log(error);
     }
+    setIsLoadingState(false);
   };
 
   const openConfirmationModal = () => {
@@ -67,6 +78,7 @@ export const CommentSection = ({
 
   const handleDeleteComment = async (id: number) => {
     try {
+      setIsLoadingState(true);
       const response = await axios.delete(`/api/comment`, {
         params: { id: id, jwt: user?.jwt, userId: user?.id },
       });
@@ -79,18 +91,35 @@ export const CommentSection = ({
     }
 
     setIsModalOpen(false);
+    setIsLoadingState(false);
   };
 
   const handleEditComment = (id: number) => {
+    setIsCommentInvalid(false);
     setEditingCommentId(id);
+    setComment("");
     const commentToEdit = comments.find((comment) => comment.id === id);
     if (commentToEdit) {
-      setCommentEdit(commentToEdit.content);
+      setCommentEdit(commentToEdit?.content || "");
     }
   };
 
+  const handleEditCommentContent = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const content = event.target.value;
+    const isContentValid = validateComment(content);
+    setIsCommentInvalid(!isContentValid);
+    setCommentEdit(content);
+  };
+
   const handleSaveComment = async () => {
+    if (!user || isCommentInvalid) {
+      return;
+    }
+
     try {
+      setIsLoadingState(true);
       const response = await axios.patch(`/api/comment`, {
         id: editingCommentId,
         content: commentEdit,
@@ -107,6 +136,7 @@ export const CommentSection = ({
 
     setEditingCommentId(null);
     setCommentEdit("");
+    setIsLoadingState(false);
   };
 
   const commentCards = comments.map((comment) => (
@@ -132,16 +162,17 @@ export const CommentSection = ({
           {editingCommentId === comment.id ? (
             <S.CommentEditingWrapper>
               <S.CommentInput
-                onChange={(e) => setCommentEdit(e.target.value)}
+                onChange={handleEditCommentContent}
                 value={commentEdit}
                 minRows={2}
-                placeholder="Type comment..."
+                isInvalid={isCommentInvalid}
               />
               <S.CommentActions>
                 <S.Button
                   variant="contained"
                   color="primary"
                   onClick={handleSaveComment}
+                  disabled={!user || isCommentInvalid}
                 >
                   Save
                 </S.Button>
@@ -149,7 +180,10 @@ export const CommentSection = ({
                 <Button
                   variant="contained"
                   color="error"
-                  onClick={() => setEditingCommentId(null)}
+                  onClick={() => {
+                    setEditingCommentId(null);
+                    setIsCommentInvalid(false);
+                  }}
                 >
                   Cancel
                 </Button>
@@ -173,6 +207,7 @@ export const CommentSection = ({
               variant="contained"
               color="secondary"
               onClick={() => handleDeleteComment(comment.id)}
+              data-testid="delete-comment-button"
             >
               Yes
             </Button>
@@ -190,9 +225,9 @@ export const CommentSection = ({
   ));
 
   return (
-    <S.CommentSectionWrapper>
+    <S.CommentSectionWrapper data-testid="comment-section">
       <h2>Comments</h2>
-      {isLoading ? (
+      {isLoadingState ? (
         <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
           <CircularProgress color="secondary" />
         </Box>
@@ -206,12 +241,15 @@ export const CommentSection = ({
             value={comment}
             minRows={5}
             placeholder="Type comment..."
+            data-testid="comment-input"
+            isInvalid={isCommentInvalid}
           />
           <S.Button
             variant="contained"
             color="primary"
             onClick={handlePostComment}
-            disabled={!user}
+            data-testid="post-comment-button"
+            disabled={!user || isCommentInvalid}
           >
             Post
           </S.Button>

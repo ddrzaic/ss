@@ -1,5 +1,5 @@
 import { StoryCardProps } from "@/components/StoryCard/StoryCard";
-import { DateTime, Filters, Story } from "@/types/common";
+import { DateTime, Story } from "@/types/common";
 
 export const mapStoryToStoryCard = (story: Story): StoryCardProps => {
   return {
@@ -46,7 +46,17 @@ export function setCookie(
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-export function getCookie(cname: string, cookies?: string) {
+export function getCookie(cname: string, cookiesProp?: string) {
+  let cookies = cookiesProp;
+  //check if document is defined (for SSR)
+  if (typeof document === "undefined" && !cookies) {
+    return "";
+  }
+
+  if (!cookies) {
+    cookies = document.cookie;
+  }
+
   let name = cname + "=";
   let decodedCookie = decodeURIComponent(cookies ?? document.cookie);
   let ca = decodedCookie.split(";");
@@ -61,3 +71,16 @@ export function getCookie(cname: string, cookies?: string) {
   }
   return "";
 }
+
+export const validateName = (name: string): boolean => {
+  const nameRegex = /^[a-zA-Z0-9 ]*$/;
+
+  return nameRegex.test(name);
+};
+
+export const validateComment = (comment: string): boolean => {
+  const commentRegex = /^[a-zA-Z0-9.,!? ČčĆćŠšŽžĐđ]*$/;
+  return (
+    commentRegex.test(comment) && comment.length > 0 && comment.length < 1000
+  );
+};

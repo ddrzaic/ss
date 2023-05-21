@@ -131,8 +131,10 @@ export const StoryCardsWrapper = ({
     <S.StoryCardsWrapper>
       {isLoading ? (
         <CircularProgress color="secondary" style={{ marginTop: "200px" }} />
-      ) : (
+      ) : cards.length > 0 ? (
         cards
+      ) : (
+        <p>No stories found</p>
       )}
     </S.StoryCardsWrapper>
   );

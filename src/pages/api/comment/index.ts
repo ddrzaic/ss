@@ -24,10 +24,6 @@ export default async function handler(
           return;
         }
 
-        console.log("userId", userId);
-        console.log("storyId", storyId);
-        console.log("content", content);
-
         await addComment(userId, storyId, content);
 
         res.status(200).end();
