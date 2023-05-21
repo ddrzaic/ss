@@ -12,11 +12,13 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { useUser } from "../UserProvider/UserProvider";
 
 const pages = ["Favorites", "Categories", "About"];
 const settings = ["Profile", "Logout"];
 
 export const Header = () => {
+  const { user } = useUser();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -130,6 +132,9 @@ export const Header = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
+            <Typography noWrap component="a" marginRight={"10px"}>
+              {user?.name}
+            </Typography>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Admin" />

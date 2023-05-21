@@ -1,35 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as S from "./FiltersBar.styled";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { Category, Filters } from "@/types/common";
+import axios from "axios";
 
 type FiltersBarProps = {
   filters: Filters;
   setFilters: (filters: Filters) => void;
 };
 
-const categories: Category[] = [
-  { label: "All", id: 1 },
-  { label: "Action", id: 2 },
-  { label: "Adventure", id: 3 },
-  { label: "Comedy", id: 4 },
-  { label: "Crime", id: 5 },
-  { label: "Drama", id: 6 },
-  { label: "Fantasy", id: 7 },
-  { label: "Historical", id: 8 },
-  { label: "Horror", id: 9 },
-  { label: "Mystery", id: 10 },
-  { label: "Romance", id: 11 },
-  { label: "Science Fiction", id: 12 },
-  { label: "Thriller", id: 13 },
-  { label: "Western", id: 14 },
-];
-
 export const FiltersBar: React.FC<FiltersBarProps> = ({
   filters,
   setFilters,
 }) => {
+  const [categories, setCategories] = React.useState<Category[]>([]);
   const [category, setCategory] = React.useState<Category>(
     filters.category as Category
   );
@@ -57,6 +42,16 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
       setFilters({ ...filters, name: event.target.value });
     }, 350);
   };
+
+  useEffect(() => {
+    const asyncFetchCategories = async () => {
+      const response = await axios.get("/api/categories");
+      const categories = response.data.categories;
+      setCategories(categories);
+    };
+
+    asyncFetchCategories();
+  }, []);
 
   return (
     <S.FiltersBarWrapper>

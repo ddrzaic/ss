@@ -1,3 +1,4 @@
+import { CommentSection } from "@/components/CommentSection/CommentSection";
 import { Header } from "@/components/Header/Header";
 import { StoryDetails } from "@/components/StoryDetails/StoryDetails";
 import { Story } from "@/types/common";
@@ -8,7 +9,8 @@ type StoryProps = {
 };
 
 export const StoryPage = ({ story }: StoryProps) => {
-  const { id, title, content, category, author, date, isFavorite } = story;
+  const { id, title, content, category, author, date, isFavorite, comments } =
+    story;
   return (
     <>
       <Header />
@@ -21,6 +23,7 @@ export const StoryPage = ({ story }: StoryProps) => {
         date={date}
         isFavorite={isFavorite}
       />
+      <CommentSection comments={comments} storyId={id} />
     </>
   );
 };

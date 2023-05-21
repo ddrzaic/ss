@@ -4,8 +4,12 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeOptions, ThemeProvider, createTheme } from "@mui/material/styles";
 import { ThemeProvider as SCThemeProvider } from "styled-components";
+import { UserProvider } from "@/components/UserProvider/UserProvider";
+import { User } from "@/types/common";
+import { FavoritesProvider } from "@/components/FavoritesProvider/FavoritesProvider";
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -20,14 +24,24 @@ const theme = createTheme({
       secondary: "#666666",
     },
   },
-});
+} as ThemeOptions);
+
+const mockUser: User = {
+  id: 2,
+  name: "John Doe",
+  email: "user@gmail.com",
+};
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <SCThemeProvider theme={theme}>
-      <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </SCThemeProvider>
+    <UserProvider initUser={mockUser}>
+      <FavoritesProvider>
+        <SCThemeProvider theme={theme}>
+          <ThemeProvider theme={theme}>
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </SCThemeProvider>
+      </FavoritesProvider>
+    </UserProvider>
   );
 }

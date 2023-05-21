@@ -1,0 +1,289 @@
+-- POSTGRESQL 15
+-- POSTGRESQL 15
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  surname VARCHAR(50) NOT NULL,
+  email VARCHAR(50) NOT NULL,
+  age INTEGER NOT NULL,
+  password VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE comments(
+	id SERIAL PRIMARY KEY ,
+  userId INTEGER NOT NULL,
+  storyId INTEGER NOT NULL,
+  content VARCHAR(1000) NOT NULL,
+  published TIMESTAMP NOT NULL,
+  FOREIGN KEY (userId) REFERENCES users(id),
+  FOREIGN KEY (storyId) REFERENCES stories(id)
+);
+
+CREATE TABLE genres(
+  id  SERIAL PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE stories(
+  title VARCHAR(100) NOT NULL,
+  id SERIAL PRIMARY KEY,
+  userId INTEGER NOT NULL,
+  content VARCHAR(10000) NOT NULL,
+  shortened VARCHAR(500) NOT NULL,
+  published TIMESTAMP NOT NULL,
+  language VARCHAR(50) NOT NULL,
+  genreId INTEGER NOT NULL,
+  FOREIGN KEY (userId) REFERENCES users(id),
+  FOREIGN KEY (genreId) REFERENCES genres(id)
+);
+
+CREATE TABLE likes(
+  id SERIAL PRIMARY KEY,
+  userId INTEGER NOT NULL,
+  storyId INTEGER NOT NULL,
+  FOREIGN KEY (userId) REFERENCES users(id),
+  FOREIGN KEY (storyId) REFERENCES stories(id)
+);
+
+-- INSERT DATA
+
+INSERT INTO users (name, surname, email, age, password) VALUES ('John', 'Doe', 'John@Doe.com', 45, '123456');
+INSERT INTO users (name, surname, email, age, password) VALUES ('Pero', 'Perich', 'Pero@Perich.com', 45, '123456');
+INSERT INTO users (name, surname, email, age, password) VALUES ('Ivan', 'Ivanic', 'Ivan@Ivanich.com', 20, '123456');
+INSERT INTO users (name, surname, email, age, password) VALUES ('Marko', 'Markic', 'Marko@Markic.com', 14, '123456');
+INSERT INTO users (name, surname, email, age, password) VALUES ('Ana', 'Anic', 'Ana@Anic.com', 66, '123456');
+
+INSERT INTO genres (name) VALUES
+  ('Action'), ('Adventure'), ('Comedy'), ('Drama'), ('Fantasy'), ('Horror'), ('Mystery'), ('Romance'), ('Science Fiction'), ('Thriller'),
+  ('Animation'), ('Crime'), ('Documentary'), ('Family'), ('Historical'), ('Musical'), ('Sports'), ('Supernatural'), ('War'), ('Western');
+
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Adventure Begins',
+  2,
+  'Once upon a time, in a land far away, there lived a brave young knight named Sir Richard. He was known throughout the kingdom for his courage and honor. One day, a messenger arrived at the castle with news of a great dragon terrorizing the nearby village. Sir Richard knew it was his duty to protect the innocent. He gathered his armor and sword, mounted his trusty steed, and set off on a quest to face the fearsome dragon...',
+  'In a land far away, a brave knight embarks on a perilous quest...',
+  '2023-05-21 09:00:00',
+  'English',
+  2
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Haunting of Hill House',
+  2,
+  'Hill House had stood for over a hundred years, silent and brooding. Legends surrounded it, tales of hauntings and tragic deaths. One summer, a group of individuals decided to spend the night in Hill House to investigate the supernatural occurrences. As the night wore on, they discovered that the house held secrets beyond their wildest imagination. Ghostly apparitions, unexplained noises, and a pervasive sense of dread plagued them...',
+  'A group of investigators faces the horrors of a haunted house...',
+  '2023-05-22 14:30:00',
+  'English',
+  7
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'La Isla Misteriosa',
+  3,
+  'En una remota isla del Pacífico, un grupo de náufragos se encuentra varado tras un naufragio. Pronto descubren que la isla esconde secretos inimaginables. Extrañas criaturas, paisajes asombrosos y misteriosas ruinas los esperan en cada paso. A medida que exploran la isla, se dan cuenta de que no están solos y que deben desvelar los enigmas de la isla misteriosa para sobrevivir...',
+  'Un grupo de náufragos lucha por sobrevivir en una isla llena de misterios...',
+  '2023-05-23 18:45:00',
+  'Spanish',
+  1
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Lost City of Atlantis',
+  5,
+  'Legend tells of an ancient city that once thrived beneath the depths of the ocean. Many have searched for the fabled Atlantis, but none have succeeded. Our brave protagonist, Alex, sets sail on a perilous journey to uncover the truth. Armed with maps and ancient texts, Alex braves treacherous waters and encounters mythical creatures in a race against time. Will the lost city reveal its secrets, or will it remain forever hidden beneath the waves?',
+  'Join Alex on an epic quest to discover the truth about Atlantis...',
+  '2023-05-24 11:30:00',
+  'English',
+  5
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Time Traveler''s Dilemma',
+  3,
+  'Dr. Emily Carter, a brilliant physicist, invents a time machine capable of altering the course of history. However, her creation comes with unforeseen consequences. As she travels through time, she witnesses the ripple effects of her actions, changing the present and endangering the future. Driven by the desire to restore balance, she embarks on a thrilling adventure, racing against time itself. Can she fix the timeline and save humanity from the chaos she has unleashed?',
+  'A scientist faces the repercussions of time travel in a high-stakes race against destiny...',
+  '2023-05-25 16:45:00',
+  'English',
+  3
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'O Mistério da Mansão Assombrada',
+  4,
+  'Na pacata vila de Sombriosol, uma antiga mansão desperta a curiosidade e o medo dos moradores. Dizem que ela é assombrada por espíritos vingativos e que esconde segredos sombrios. Ana, uma destemida detetive, é chamada para desvendar o mistério por trás da mansão. Enfrentando enigmas sinistros e aparições fantasmagóricas, ela mergulha em uma trama intrigante e perigosa. Conseguirá Ana desvendar os segredos da mansão e libertar as almas aprisionadas?',
+  'Uma detetive corajosa enfrenta o mistério de uma mansão assombrada...',
+  '2023-05-26 20:15:00',
+  'Portuguese',
+  6
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Forgotten Kingdom',
+  4,
+  'Deep in the heart of an ancient forest lies a forgotten kingdom. Sophie, a young wanderer, stumbles upon the ruins of this majestic realm. As she explores the crumbling castles and overgrown pathways, she unravels the kingdom''s tragic history. With the help of newfound friends, Sophie embarks on a quest to restore the kingdom to its former glory. Will she succeed in bringing back the magic and wonder of the forgotten kingdom?',
+  'Discover the secrets of a lost kingdom in this enchanting tale...',
+  '2023-05-27 09:30:00',
+  'English',
+  2
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Quantum Puzzle',
+  2,
+  'Professor Alex Mason, a brilliant physicist, discovers a mysterious artifact that holds the key to unlimited power. As he delves deeper into the quantum puzzle, he becomes entangled in a web of intrigue and danger. Racing against rival scientists and shadowy organizations, Professor Mason must solve the puzzle before it falls into the wrong hands. Will he unlock the secrets of the universe, or will the power of the artifact bring chaos and destruction?',
+  'Embark on a thrilling adventure through the mysteries of quantum physics...',
+  '2023-05-28 14:45:00',
+  'English',
+  7
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'A Magia do Circo',
+  6,
+  'O Circo Místico é conhecido por sua magia e encanto. Luna, uma jovem acrobata, entra em um mundo de ilusões e maravilhas quando é convidada a fazer parte do circo. Entre trapezistas voadores, palhaços enigmáticos e mágicos talentosos, Luna descobre segredos ocultos e forças místicas que regem o circo. Em uma jornada repleta de desafios e emoções, ela descobre seu próprio potencial e o poder da verdadeira amizade.',
+  'Descubra a magia do circo neste conto encantador...',
+  '2023-05-29 18:00:00',
+  'Portuguese',
+  1
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Crystal Caverns',
+  2,
+  'In a remote corner of the world lies a hidden realm known as the Crystal Caverns. Sarah, a brave explorer, embarks on a perilous journey to uncover the secrets of this mystical underground world. As she navigates through shimmering crystal formations and encounters ancient creatures, Sarah discovers a power that could change the fate of both the underground realm and the surface world above.',
+  'Explore the wonders of the Crystal Caverns in this captivating tale...',
+  '2023-06-01 10:00:00',
+  'English',
+  2
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'A Jornada da Coragem',
+  4,
+  'Em um reino ameaçado por uma terrível maldição, uma jovem chamada Sofia embarca em uma jornada épica para encontrar a lendária Pedra da Coragem. Com seus companheiros improváveis, ela enfrenta perigos e desafios mortais em sua busca pela única esperança de salvar seu povo. Ao longo do caminho, Sofia descobre a força interior necessária para superar qualquer obstáculo e restaurar a paz em seu reino.',
+  'Acompanhe Sofia em uma jornada repleta de coragem e aventura...',
+  '2023-06-03 18:45:00',
+  'Portuguese',
+  1
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Secret of the Timekeepers',
+  5,
+  'A mysterious pocket watch falls into the hands of young Thomas, transporting him through time. With each journey, Thomas uncovers the existence of the Timekeepers, a secret society entrusted with preserving the fabric of time. As he learns to control the power of the pocket watch, Thomas must prevent a catastrophic event that could unravel the very essence of reality itself.',
+  'Unravel the secret of the Timekeepers in this thrilling tale...',
+  '2021-06-04 21:15:00',
+  'English',
+  7
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'As Asas da Liberdade',
+  3,
+  'Num mundo onde a magia está proibida, Sofia, uma jovem aprendiz de feiticeira, luta contra a opressão e a injustiça. Guiada por uma antiga profecia, ela embarca em uma jornada para despertar a magia que jaz adormecida no coração das pessoas. Enfrentando perigos e perseguições, Sofia se torna um símbolo de esperança para os oprimidos e desencadeia uma revolução que pode mudar o destino de todos.',
+  'Descubra o poder da magia e da liberdade nesta envolvente história...',
+  '2022-06-05 09:30:00',
+  'Portuguese',
+  4
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'O Guardião dos Sonhos',
+  4,
+  'Em uma pequena cidade onde os sonhos são roubados por uma entidade sombria, Miguel, um jovem destemido, recebe uma missão divina. Ele se torna o Guardião dos Sonhos, encarregado de proteger o mundo dos sonhadores e recuperar os sonhos perdidos. Com coragem e determinação, Miguel enfrenta pesadelos aterrorizantes e descobre seu próprio poder interior para restaurar a esperança e a imaginação no coração das pessoas.',
+  'Desvende os mistérios dos sonhos nesta envolvente jornada...',
+  '2021-06-07 15:00:00',
+  'Portuguese',
+  3
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Forgotten Star',
+  6,
+  'In a distant galaxy, a forgotten star holds the key to the universe''s greatest secret. Captain Alex and her intrepid crew embark on an interstellar quest to locate the elusive star and uncover its hidden power. Battling against space pirates and navigating treacherous celestial phenomena, they race against time to save the galaxy from an ancient darkness that threatens to consume all.',
+  'Embark on an epic space adventure in search of the Forgotten Star...',
+  '2021-06-08 17:15:00',
+  'English',
+  6
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'O Enigma do Relógio Mágico',
+  6,
+  'No sótão empoeirado de sua avó, Pedro encontra um antigo relógio mágico com poderes além da compreensão. Ao ajustar os ponteiros do relógio, ele é transportado para um mundo encantado onde animais falam e a magia é real. Em uma corrida contra o tempo, Pedro precisa desvendar o enigma do relógio mágico antes que seja aprisionado nesse reino místico para sempre.',
+  'Desvende o enigma de um relógio mágico nesta fascinante história...',
+  '2021-06-09 20:30:00',
+  'Portuguese',
+  2
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'The Mirror of Reflections',
+  3,
+  'Anna, a young artist, discovers a magical mirror that reflects different versions of reality. With each reflection, Anna glimpses alternate lives and possibilities. As she delves deeper into the mirror''s secrets, she must confront the consequences of her choices and navigate a web of interconnected dimensions. Will she find her true path, or will the mirror consume her in a labyrinth of endless reflections?',
+  'Step into the realm of reflections in this mind-bending tale...',
+  '2022-06-12 11:15:00',
+  'English',
+  3
+);
+
+INSERT INTO stories (title, userId, content, shortened, published, language, genreId)
+VALUES (
+  'A Terra dos Sonhos Perdidos',
+  5,
+  'Em um mundo onde os sonhos são roubados, Clara, uma jovem destemida, embarca em uma jornada para encontrar a lendária Terra dos Sonhos Perdidos. Ao lado de seus amigos leais, ela enfrenta criaturas sombrias e desafios impossíveis. Confrontando seus próprios medos e descobrindo a força interior, Clara se torna a última esperança para restaurar a magia dos sonhos e trazer esperança de volta ao mundo.',
+  'Descubra a Terra dos Sonhos Perdidos nesta emocionante aventura...',
+  '2022-06-13 13:30:00',
+  'Portuguese',
+  1
+);
+
+INSERT INTO likes (userId, storyId) VALUES (2, 45);
+INSERT INTO likes (userId, storyId) VALUES (2, 46);
+INSERT INTO likes (userId, storyId) VALUES (2, 47);
+INSERT INTO likes (userId, storyId) VALUES (2, 48);
+INSERT INTO likes (userId, storyId) VALUES (2, 49);
+INSERT INTO likes (userId, storyId) VALUES (2, 50);
+
+INSERT INTO comments (userId, storyId, content, published) VALUES (2, 45, 'This is a great story!', '2023-05-21 09:30:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (2, 46, 'I love it!', '2023-05-21 09:45:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (2, 47, 'This is my favorite story!', '2023-05-21 10:00:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (2, 48, 'I can''t wait to read more!', '2023-05-21 10:15:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (2, 49, 'This is the best story ever!', '2023-05-21 10:30:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (2, 50, 'I love this story!', '2023-05-21 10:45:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (3, 45, 'I love this story!', '2023-05-21 10:45:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (3, 46, 'I love this story!', '2023-05-21 10:45:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (3, 47, 'I love this story!', '2023-05-21 10:45:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (3, 48, 'I love this story!', '2023-05-21 10:45:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (3, 49, 'I love this story!', '2023-05-21 10:45:00');
+INSERT INTO comments (userId, storyId, content, published) VALUES (3, 50, 'I love this story!', '2023-05-21 10:45:00');
+
+
+
+
+
+
+
+
+
+
+
+
