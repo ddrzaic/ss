@@ -1,3 +1,4 @@
+import { IconButton } from "@mui/material";
 import styled, { css } from "styled-components";
 
 export const StoryDetailsContainer = styled.div(
@@ -84,5 +85,11 @@ export const Content = styled.p`
 
   @media (max-width: 768px) {
     font-size: 16px;
+  }
+`;
+
+export const HeartIconWrapper = styled(IconButton)`
+  svg {
+    font-size: 30px;
   }
 `;

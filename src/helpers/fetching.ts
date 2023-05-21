@@ -1,4 +1,4 @@
-import { Category, Filters, Story } from "@/types/common";
+import { Category, Comment, Filters, Story } from "@/types/common";
 import { conn } from "./db";
 
 export const fetchStories = async (filters: Filters): Promise<Story[]> => {
@@ -113,7 +113,35 @@ export const deleteFavorite = async (userId: number, storyId: number) => {
   await conn.query(deleteFavoriteQuery, [userId, storyId]);
 };
 
-export const fetchStory = async (storyId: number) => {
+export const fetchComments = async (storyId: number) => {
+  const commentsQuery = `
+    SELECT comments.* , users.name, users.surname
+    FROM comments
+    LEFT JOIN users ON comments.userid = users.id
+    WHERE comments.storyId = $1
+  `;
+  const response = await conn.query(commentsQuery, [storyId]);
+
+  let comments: Comment[] = [];
+
+  if (response.rows.length > 0) {
+    comments = response.rows.map((row) => {
+      const comment = JSON.parse(JSON.stringify(row));
+      return {
+        id: comment.id,
+        timestamp: comment.published,
+        content: comment.content,
+        user: `${comment.name} ${comment.surname}`,
+        userId: comment.userid,
+        storyId: comment.storyid,
+      };
+    });
+  }
+
+  return comments;
+};
+
+export const fetchStory = async (storyId: number, userId?: number) => {
   const storyQuery = `
     SELECT stories.*, genres.name as genreName, users.name as authorName, users.surname as authorSurname 
     FROM stories 
@@ -122,16 +150,12 @@ export const fetchStory = async (storyId: number) => {
     WHERE stories.id = $1
   `;
 
-  const commentsQuery = `
-    SELECT comments.* , users.name, users.surname
-    FROM comments
-    LEFT JOIN users ON comments.userid = users.id
-    WHERE comments.storyId = $1
-  `;
-
   const storyResponse = await conn.query(storyQuery, [storyId]);
 
-  const commentsResponse = await conn.query(commentsQuery, [storyId]);
+  let favorites: number[] = [];
+  if (userId) {
+    favorites = await fetchFavorites(userId);
+  }
 
   let story: Story = {} as Story;
 
@@ -148,24 +172,57 @@ export const fetchStory = async (storyId: number) => {
       },
       author: `${row.authorname} ${row.authorsurname}`,
       date: row.published,
-      isFavorite: false,
+      isFavorite: favorites.includes(row.id),
       comments: [],
     };
   }
 
-  if (commentsResponse.rows.length > 0) {
-    story.comments = commentsResponse.rows.map((row) => {
-      const comment = JSON.parse(JSON.stringify(row));
-      return {
-        id: comment.id,
-        timestamp: comment.published,
-        content: comment.content,
-        user: `${comment.name} ${comment.surname}`,
-        userId: comment.userid,
-        storyId: comment.storyid,
-      };
-    });
-  }
+  const comments: Comment[] = await fetchComments(storyId);
+
+  story.comments = comments;
 
   return story;
+};
+
+export const checkToken = async (userId: number, token: string) => {
+  const checkTokenQuery = `
+    SELECT * FROM usertoken WHERE userId = $1 AND token = $2
+  `;
+
+  const response = await conn.query(checkTokenQuery, [userId, token]);
+
+  return response.rows.length > 0;
+};
+
+export const addComment = async (
+  userId: number,
+  storyId: number,
+  content: string
+) => {
+  const timestamp = new Date().toISOString();
+  console.log("timestamp", timestamp);
+
+  const addCommentQuery = `
+    INSERT INTO comments (userId, storyId, content, published) VALUES ($1, $2, $3, $4)
+  `;
+
+  await conn.query(addCommentQuery, [userId, storyId, content, timestamp]);
+};
+
+export const deleteComment = async (commentId: number) => {
+  const deleteCommentQuery = `
+    DELETE FROM comments WHERE id = $1
+  `;
+
+  await conn.query(deleteCommentQuery, [commentId]);
+};
+
+export const editComment = async (commentId: number, content: string) => {
+  const timestamp = new Date().toISOString();
+
+  const editCommentQuery = `
+    UPDATE comments SET content = $1, published = $2 WHERE id = $3
+  `;
+
+  await conn.query(editCommentQuery, [content, timestamp, commentId]);
 };

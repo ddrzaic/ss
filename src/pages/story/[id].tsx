@@ -1,3 +1,4 @@
+import { getCookie } from "@/helpers/common";
 import { fetchStory } from "@/helpers/fetching";
 import { Comment, Story } from "@/types/common";
 import { StoryPage as StoryPageComponent } from "@/views/Story/Story";
@@ -17,7 +18,11 @@ export const getServerSideProps: GetServerSideProps<StoryPageProps> = async (
 ) => {
   const id = context.params?.id;
 
-  const story = await fetchStory(parseInt(id as string));
+  const cookies = context.req.headers.cookie;
+  const userId = getCookie("userId", cookies);
+
+  const story = await fetchStory(parseInt(id as string), Number(userId));
+
   return {
     props: {
       story,

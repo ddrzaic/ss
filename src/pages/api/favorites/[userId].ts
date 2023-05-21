@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import {
   addFavorite,
+  checkToken,
   deleteFavorite,
   fetchFavorites,
 } from "@/helpers/fetching";
@@ -16,6 +17,8 @@ export default async function handler(
 ) {
   const userId = parseInt(req.query.userId as string);
   let storyId = null;
+  let jwt = null;
+
   switch (req.method) {
     case "GET":
       const favorites = await fetchFavorites(userId);
@@ -24,6 +27,15 @@ export default async function handler(
     case "POST":
       try {
         storyId = parseInt(req.body.storyId as string);
+        jwt = req.body.jwt as string;
+
+        const isAuthorized = await checkToken(userId, jwt);
+
+        if (!isAuthorized) {
+          res.status(401).end();
+          return;
+        }
+
         if (storyId) {
           await addFavorite(userId, storyId);
           res.status(200).end();
@@ -39,6 +51,15 @@ export default async function handler(
     case "DELETE":
       try {
         storyId = parseInt(req.query.storyId as string);
+        jwt = req.query.jwt as string;
+
+        const isAuthorized = await checkToken(userId, jwt);
+
+        if (!isAuthorized) {
+          res.status(401).end();
+          return;
+        }
+
         if (storyId) {
           await deleteFavorite(userId, storyId);
           res.status(200).end();

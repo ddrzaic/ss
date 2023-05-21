@@ -33,4 +33,10 @@ export type User = {
   id: number;
   name: string;
   email: string;
+  jwt?: string;
+};
+
+export type DateTime = {
+  date: string;
+  time: string;
 };

@@ -15,7 +15,7 @@ export const StoryCardContainer = styled.div(
     cursor: pointer;
 
     &:hover {
-      transform: scale(1.03);
+      transform: scale(1.05);
     }
 
     /* full width on mobile */
@@ -23,6 +23,18 @@ export const StoryCardContainer = styled.div(
       width: 100%;
       max-width: 100%;
     }
+
+    /* animate showing up */
+    @keyframes slideUp {
+      from {
+        transform: translateY(200%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    animation: slideUp 0.3s ease-in-out;
   `
 );
 

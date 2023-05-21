@@ -9,8 +9,38 @@ type StoryProps = {
 };
 
 export const StoryPage = ({ story }: StoryProps) => {
-  const { id, title, content, category, author, date, isFavorite, comments } =
-    story;
+  const {
+    id,
+    title,
+    content,
+    category,
+    author,
+    date,
+    isFavorite,
+    comments: initialComments,
+  } = story;
+
+  const [comments, setComments] = React.useState(initialComments);
+  const [isCommentSectionLoading, setIsCommentSectionLoading] =
+    React.useState(false);
+
+  const handleCommentSectionUpdate = () => {
+    // fetch comments
+    const asyncFetchComments = async () => {
+      setIsCommentSectionLoading(true);
+      try {
+        const response = await fetch(`/api/comments/${id}`);
+        const data = await response.json();
+        setComments(data.comments);
+      } catch (error) {
+        console.log(error);
+      }
+
+      setIsCommentSectionLoading(false);
+    };
+    asyncFetchComments();
+  };
+
   return (
     <>
       <Header />
@@ -23,7 +53,12 @@ export const StoryPage = ({ story }: StoryProps) => {
         date={date}
         isFavorite={isFavorite}
       />
-      <CommentSection comments={comments} storyId={id} />
+      <CommentSection
+        comments={comments}
+        storyId={id}
+        notify={handleCommentSectionUpdate}
+        isLoading={isCommentSectionLoading}
+      />
     </>
   );
 };

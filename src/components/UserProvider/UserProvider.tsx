@@ -1,5 +1,6 @@
+import { setCookie } from "@/helpers/common";
 import { User } from "@/types/common";
-import React from "react";
+import React, { useEffect } from "react";
 
 type UserContextProps = {
   user: User;
@@ -21,6 +22,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({
   initUser,
 }) => {
   const [user, setUser] = React.useState<User>(initUser);
+
+  useEffect(() => {
+    setCookie("userId", user.id, 30);
+  }, [user]);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

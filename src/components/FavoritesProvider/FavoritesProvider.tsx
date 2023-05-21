@@ -23,7 +23,7 @@ export const FavoritesProvider: React.FC<FavoritesProviderProps> = ({
 }) => {
   const { user } = useUser();
   const [favorites, setFavorites] = React.useState<number[]>([]);
-  const [isFetching, setIsFetching] = React.useState<boolean>(false);
+  const [isFetching, setIsFetching] = React.useState<boolean>(true);
 
   useEffect(() => {
     // fetch fevorite stories

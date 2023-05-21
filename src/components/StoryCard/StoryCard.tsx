@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import * as S from "./StoryCard.styled";
 import { IconButton, Tooltip } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useRouter } from "next/router";
-import { fetchFavorites } from "@/helpers/fetching";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useUser } from "../UserProvider/UserProvider";
 import axios from "axios";
 import { useFavorites } from "../FavoritesProvider/FavoritesProvider";
+import { formatDateTime } from "@/helpers/common";
 
 export type StoryCardProps = {
   id: number;
@@ -32,6 +33,7 @@ export const StoryCard: React.FC<StoryCardProps> = ({
   handleFavoriteClick,
 }) => {
   const { push } = useRouter();
+  const { isFetching } = useFavorites();
 
   const onClickHandler = () => {
     push(`/story/${id}`);
@@ -46,24 +48,29 @@ export const StoryCard: React.FC<StoryCardProps> = ({
       <S.StoryCardMeta>
         <S.StoryCardMetaItem>{category}</S.StoryCardMetaItem>
         <S.StoryCardMetaItem>{author}</S.StoryCardMetaItem>
-        <S.StoryCardMetaItem>{date}</S.StoryCardMetaItem>
+        <S.StoryCardMetaItem>{formatDateTime(date).date}</S.StoryCardMetaItem>
       </S.StoryCardMeta>
       <S.StoryCardActions>
-        <Tooltip
-          title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-          placement="top"
-        >
-          <IconButton
-            aria-label="add to favorites"
-            disableRipple
-            onClick={(e) => {
-              e.stopPropagation();
-              handleFavoriteClick && handleFavoriteClick(id);
-            }}
+        {!isFetching ? (
+          <Tooltip
+            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            placement="top"
           >
-            <FavoriteIcon color={isFavorite ? "secondary" : "primary"} />
-          </IconButton>
-        </Tooltip>
+            <IconButton
+              aria-label="add to favorites"
+              disableRipple
+              onClick={(e) => {
+                e.stopPropagation();
+                handleFavoriteClick && handleFavoriteClick(id);
+              }}
+              data-testid="favorite-button"
+            >
+              <FavoriteIcon color={isFavorite ? "secondary" : "primary"} />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <CircularProgress color="secondary" />
+        )}
       </S.StoryCardActions>
     </S.StoryCardContainer>
   );
@@ -71,28 +78,31 @@ export const StoryCard: React.FC<StoryCardProps> = ({
 
 type StoryCardsWrapperProps = {
   storyCards: StoryCardProps[];
+  isLoading?: boolean;
 };
 
-export const StoryCardsWrapper = ({ storyCards }: StoryCardsWrapperProps) => {
+export const StoryCardsWrapper = ({
+  storyCards,
+  isLoading,
+}: StoryCardsWrapperProps) => {
   const cards: JSX.Element[] = [];
-  const { favorites, setFavorites, isFetching } = useFavorites();
+  const { favorites, setFavorites } = useFavorites();
   const { user } = useUser();
 
   const handleFavoriteClick = async (id: number) => {
-    if (isFetching) return;
-
     const shouldAddToFavorites = !favorites.includes(id);
 
     if (shouldAddToFavorites) {
       const response = await axios.post(`/api/favorites/${user?.id}`, {
         storyId: id,
+        jwt: user?.jwt,
       });
       if (response.status === 200) {
         setFavorites([...favorites, id]);
       }
     } else {
       const response = await axios.delete(`/api/favorites/${user?.id}`, {
-        params: { storyId: id },
+        params: { storyId: id, jwt: user?.jwt },
       });
       if (response.status === 200) {
         setFavorites(favorites.filter((favorite) => favorite !== id));
@@ -112,9 +122,18 @@ export const StoryCardsWrapper = ({ storyCards }: StoryCardsWrapperProps) => {
         isFavorite={favorites.includes(storyCard.id)}
         id={storyCard.id}
         handleFavoriteClick={handleFavoriteClick}
+        testId={`story-card-${index}`}
       />
     );
   });
 
-  return <S.StoryCardsWrapper>{cards}</S.StoryCardsWrapper>;
+  return (
+    <S.StoryCardsWrapper>
+      {isLoading ? (
+        <CircularProgress color="secondary" style={{ marginTop: "200px" }} />
+      ) : (
+        cards
+      )}
+    </S.StoryCardsWrapper>
+  );
 };

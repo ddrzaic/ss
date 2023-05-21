@@ -45,6 +45,14 @@ CREATE TABLE likes(
   FOREIGN KEY (storyId) REFERENCES stories(id)
 );
 
+CREATE TABLE usertoken(
+  id SERIAL PRIMARY KEY,
+  userId INTEGER NOT NULL,
+  token VARCHAR(100) NOT NULL,
+  FOREIGN KEY (userId) REFERENCES users(id)
+);
+
+
 -- INSERT DATA
 
 INSERT INTO users (name, surname, email, age, password) VALUES ('John', 'Doe', 'John@Doe.com', 45, '123456');
@@ -52,6 +60,8 @@ INSERT INTO users (name, surname, email, age, password) VALUES ('Pero', 'Perich'
 INSERT INTO users (name, surname, email, age, password) VALUES ('Ivan', 'Ivanic', 'Ivan@Ivanich.com', 20, '123456');
 INSERT INTO users (name, surname, email, age, password) VALUES ('Marko', 'Markic', 'Marko@Markic.com', 14, '123456');
 INSERT INTO users (name, surname, email, age, password) VALUES ('Ana', 'Anic', 'Ana@Anic.com', 66, '123456');
+
+INSERT INTO usertoken (userId, token) VALUES (2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIn0.uUhtmccmDIK8fG3vmsNfqQ0N5i556nAzJyLyOsxQ4no');
 
 INSERT INTO genres (name) VALUES
   ('Action'), ('Adventure'), ('Comedy'), ('Drama'), ('Fantasy'), ('Horror'), ('Mystery'), ('Romance'), ('Science Fiction'), ('Thriller'),
@@ -275,6 +285,8 @@ INSERT INTO comments (userId, storyId, content, published) VALUES (3, 47, 'I lov
 INSERT INTO comments (userId, storyId, content, published) VALUES (3, 48, 'I love this story!', '2023-05-21 10:45:00');
 INSERT INTO comments (userId, storyId, content, published) VALUES (3, 49, 'I love this story!', '2023-05-21 10:45:00');
 INSERT INTO comments (userId, storyId, content, published) VALUES (3, 50, 'I love this story!', '2023-05-21 10:45:00');
+
+
 
 
 

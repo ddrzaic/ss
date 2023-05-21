@@ -57,7 +57,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
     <S.FiltersBarWrapper>
       <Autocomplete
         disablePortal
-        id="combo-box-demo"
+        id="category-select"
         options={categories}
         sx={{ width: 300 }}
         renderInput={(params) => (

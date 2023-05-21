@@ -17,9 +17,11 @@ export const HomePage = ({ storyCards: allStoryCards }: HomePageProps) => {
   const [filters, setFilters] = React.useState<Filters>({} as Filters);
   const [storyCards, setStoryCards] =
     React.useState<StoryCardProps[]>(allStoryCards);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   useEffect(() => {
     const fetchFilteredStories = async () => {
+      setIsLoading(true);
       const response = await axios.get("/api/stories", {
         params: {
           name: filters.name,
@@ -36,6 +38,7 @@ export const HomePage = ({ storyCards: allStoryCards }: HomePageProps) => {
       });
 
       setStoryCards(storyCards);
+      setIsLoading(false);
     };
 
     fetchFilteredStories();
@@ -49,7 +52,7 @@ export const HomePage = ({ storyCards: allStoryCards }: HomePageProps) => {
     <>
       <Header />
       <FiltersBar filters={filters} setFilters={filtersChangeHandler} />
-      <StoryCardsWrapper storyCards={storyCards} />
+      <StoryCardsWrapper storyCards={storyCards} isLoading={isLoading} />
     </>
   );
 };
