@@ -11,6 +11,8 @@ DB_HOST=dpg-chkdk13hp8uej77s49ag-a.frankfurt-postgres.render.com
 DB_NAME=sharestory
 ```
 
+Zatim u konzoli upisati sljedeće naredbe za instalaciju dependencyja i pokretanje web aplikacije
+
 ```bash
 yarn install
 yarn dev
